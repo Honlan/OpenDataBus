@@ -1,14 +1,32 @@
 {% extends 'layout.html' %} {% block style %}
 <style>
-
+#index {
+    padding: 40px 40px;
+}
 </style>
 {% endblock %} {% block body %}
-<div id="index">
-    这里是index
-</div>
 <script>
 $(document).ready(function() {
-
+	$('nav a').removeClass('active');
+	$('nav a#home_btn').addClass('active');
 });
 </script>
+<div id="index">
+	<div id="sources">
+		<table class="table table-hover">
+			<tr>
+				<td>数据源</td>
+				<td>源地址</td>
+				<td>数据集</td>
+			</tr>
+			{% for item in sources%}
+			<tr>
+				<td><a href="{{url_for('source', source_id=item.id)}}">{{item.name}}</a></td>
+				<td><a href="{{item.home}}">{{item.home}}</a></td>
+				<td>{{datasets[item.id]}}</td>
+			</tr>	
+			{% endfor %}
+		</table>
+	</div>
+</div>
 {% endblock %}

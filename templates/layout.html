@@ -13,19 +13,61 @@
     <script src="http://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
     <link href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" />
     <script src="http://cdn.bootcss.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-    <!--script src="{{url_for('static',filename='js/ECharts/echarts.js')}}"></script--> 
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="{{url_for('static',filename='js/jquerySession.js')}}"></script>
     {% block style %} {% endblock %}
     <style>
-    #header {
-        padding: 80px 80px;
-        padding-bottom: 40px;
-        text-align: center;
-    }
-
     body {
         font-family: Microsoft Yahei;
-        background-color: #f5f5f5;
+        background-color: #fdfdfd;
+    }
+    
+    a {
+        text-decoration: none;
+    }
+    
+    a:hover {
+        text-decoration: none;
+    }
+    
+    #header {
+        padding: 30px 60px;
+        text-align: center;
+        border-bottom: 1px solid rgba(144, 144, 144, 0.4);
+        box-shadow: 0px 3px 3px rgba(144, 144, 144, 0.4);
+        position: fixed;
+        width: 100%;
+        top: 0;
+        background-color: #fdfdfd;
+    }
+    
+    #header h3 {
+        float: left;
+        margin: 0;
+        color: #333;
+    }
+    
+    #header nav {
+        float: right;
+    }
+    
+    #header nav a {
+        color: #999;
+        margin-left: 25px;
+        font-size: 15px;
+    }
+    
+    #header nav a:hover,
+    #header nav a.active {
+        color: #333;
+    }
+    
+    #header nav a span {
+        margin-right: 6px;
+    }
+    
+    #main {
+        padding-top: 100px;
     }
     
     #footer {
@@ -41,7 +83,6 @@
     }
     
     #footer a {
-        text-decoration: none;
         color: #999;
         margin-left: 2px;
         margin-right: 2px;
@@ -57,6 +98,9 @@
     }
     </style>
     <script>
+    if (window.location.pathname == '{{url_for("manage")}}' && $.session.get('admin') != 1) {
+        window.location.href = '{{url_for("index")}}';
+    }
     // 加载echarts
     // require.config({
     //     paths: {
@@ -68,19 +112,86 @@
     //         main: 'main'
     //     }]
     // });
+    $(document).ready(function() {
+        $('#manage_btn').click(function() {
+            event.preventDefault();
+            target = $(this).attr('href');
+            if ($.session.get('admin') == 1) {
+                window.location.href = target;
+            } else {
+                $('#login-modal').modal();
+            }
+        });
+
+        $('#login_submit').click(function() {
+            $.ajax({
+                url: "{{url_for('login')}}",
+                type: 'POST',
+                data: {
+                    account: $('#login-modal form #username').val(),
+                    password: $('#login-modal form #password').val()
+                },
+                dataType: 'json',
+                error: function() {},
+                success: function(data) {
+                    if (data['ok'] == 1) {
+                        $.session.set('admin', 1);
+                        window.location.href = "{{url_for('manage')}}";
+                    } else if (data['ok'] == 0) {
+                        $.session.set('admin', 0);
+                        $('#login-modal .modal-body').append($('<p style="color:rgb(232, 53, 53);margin-left:5ox;margin-top:12px;">密码错误</p>'));
+                    }
+                }
+            });
+        });
+    });
     </script>
 </head>
 
 <body>
     <div id="header">
-        <h1>OpenDataBus</h1>
-        <h3>开放数据总线</h3>
+        <a href=""><h3>OpenDataBus</h3></a>
+        <nav>
+            <a href="{{url_for('index')}}" id="home_btn"><span class="fa fa-fw fa-home"></span>首页</a>
+            <a href="" id="search_btn"><span class="fa fa-fw fa-search"></span>搜索</a>
+            <a href="" id="compare_btn"><span class="fa fa-fw fa-exchange"></span>对比</a>
+            <a href="" id="about_btn"><span class="fa fa-fw fa-star-o"></span>关于</a>
+            <a href="{{url_for('manage')}}" id="manage_btn"><span class="fa fa-fw fa-cog"></span>管理</a>
+        </nav>
     </div>
     <div id="main">
         {% block body %} {% endblock %}
     </div>
     <div id="footer">
-        <p>Copyright © 2015 <a href="http://zhanghonglun.cn" target="_blank">Honlan</a>. All Rights Reserved.</p>
+        <p>Copyright © 2016 <a href="http://zhanghonglun.cn" target="_blank">Honlan</a>. All Rights Reserved.</p>
+    </div>
+    <div class="modal fade" id="login-modal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">登录</h4>
+                </div>
+                <div class="modal-body">
+                    <form class='form-inline'>
+                        <div class="form-group">
+                            <div>
+                                <input type='text' name='username' id='username' class='form-control' placeholder='账号' style="margin:15px;">
+                            </div>
+                            <div>
+                                <input type='password' name='password' id='password' class='form-control' placeholder='密码' style="margin:15px;margin-top:0;">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="login_submit">登录</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
     </div>
 </body>
 

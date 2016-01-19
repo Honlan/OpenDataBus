@@ -1,0 +1,287 @@
+{% extends 'layout.html' %} {% block style %}
+<style>
+#manage {
+    padding: 40px 80px;
+}
+
+#manage #add_source {
+    margin-left: 20px;
+}
+
+#manage #add_source:hover {
+    cursor: pointer;
+}
+
+#manage #sources {
+    margin-top: 30px;
+}
+
+#manage #new_source,
+#edit_source {
+    display: none;
+}
+
+#manage input {
+    margin-bottom: 15px;
+}
+
+#manage #sources .source .fa:hover {
+    cursor: pointer;
+}
+#manage #sources .source .fa-bug.active {
+    animation: rotation 2s infinite;
+    -o-animation: rotation 2s infinite;
+    -ms-animation: rotation 2s infinite;
+    -moz-animation: rotation 2s infinite;
+    -webkit-animation: rotation 2s infinite;
+}
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(180deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+@-o-keyframes rotation {
+    0% {
+        -o-transform: rotate(0deg);
+    }
+    50% {
+        -o-transform: rotate(180deg);
+    }
+    100% {
+        -o-transform: rotate(360deg);
+    }
+}
+@-ms-keyframes rotation {
+    0% {
+        -ms-transform: rotate(0deg);
+    }
+    50% {
+        -ms-transform: rotate(180deg);
+    }
+    100% {
+        -ms-transform: rotate(360deg);
+    }
+}
+@-moz-keyframes rotation {
+    0% {
+        -moz-transform: rotate(0deg);
+    }
+    50% {
+        -moz-transform: rotate(180deg);
+    }
+    100% {
+        -moz-transform: rotate(360deg);
+    }
+}
+@-webkit-keyframes rotation {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    50% {
+        -webkit-transform: rotate(180deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+</style>
+{% endblock %} {% block body %}
+<script>
+$(document).ready(function() {
+    $('nav a').removeClass('active');
+    $('nav a#manage_btn').addClass('active');
+
+    // 添加数据源
+    $('#manage #add_source').click(function() {
+        $(this).fadeOut('fast');
+        $('#manage #new_source').show();
+    });
+
+    // 确定添加数据源
+    $('#manage #add_new').click(function() {
+        $('#manage #new_source').hide();
+        $.ajax({
+                url: '{{url_for("api_add_source")}}',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    name: $('#manage #new_source input[name="name"]').val(),
+                    home: $('#manage #new_source input[name="home"]').val(),
+                    path: $('#manage #new_source input[name="path"]').val(),
+                    field: $('#manage #new_source input[name="field"]').val()
+                },
+            })
+            .done(function(data) {
+                $('#manage #new_source input[name="name"]').val('');
+                $('#manage #new_source input[name="home"]').val('');
+                $('#manage #new_source input[name="path"]').val('');
+                $('#manage #new_source input[name="field"]').val('');
+                var data = data['source'];
+                var $source = $('<div class="source"><div class="panel panel-info"><div class="panel-heading"><h4 class="panel-title">' + data['name'] + '<span style="margin-left:20px" class="fa fa-fw fa-edit"></span><span style="margin-left:20px" class="fa fa-fw fa-times"></span><span style="margin-left:20px" class="fa fa-fw fa-bug"></span></h4></div><div class="panel-body"><p name="id" style="display:none;">' + data['id'] + '</p><p name="name" style="display:none;">' + data['name'] + '</p><p name="home">' + data['home'] + '</p><p name="path">' + data['path'] + '</p><p name="field">' + data['field'] + '</p></div></div></div>');
+                $source.insertAfter($('#manage #new_source'));
+                $('#manage #add_source').fadeIn('fast');
+            })
+            .fail(function() {
+                console.log("error");
+            })
+            .always(function() {
+                console.log("complete");
+            });
+    });
+
+    // 编辑数据源
+    $('#manage #sources').on('click', '.source .fa-edit', function() {
+        $('#manage #sources .source .fa-edit').hide();
+        var $source = $(this).parent('h4').parent('.panel-heading').parent().parent('.source');
+        $('#manage #edit_source input[name="id"]').val($source.find('p[name="id"]').text());
+        $('#manage #edit_source input[name="name"]').val($source.find('p[name="name"]').text());
+        $('#manage #edit_source input[name="home"]').val($source.find('p[name="home"]').text());
+        $('#manage #edit_source input[name="path"]').val($source.find('p[name="path"]').text());
+        $('#manage #edit_source input[name="field"]').val($source.find('p[name="field"]').text());
+        $source.hide();
+        $('#manage #edit_source').insertAfter($source).show();
+    });
+
+    // 编辑完毕，保存数据源
+    $('#save_source').click(function() {
+    	$source = $(this).prev('.form-group');
+    	$.ajax({
+    		url: '{{url_for("api_edit_source")}}',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                	id: $('#manage #edit_source input[name="id"]').val(),
+                    name: $('#manage #edit_source input[name="name"]').val(),
+                    home: $('#manage #edit_source input[name="home"]').val(),
+                    path: $('#manage #edit_source input[name="path"]').val(),
+                    field: $('#manage #edit_source input[name="field"]').val()
+                },
+    	})
+    	.done(function() {
+    		var $source = $('#manage #edit_source').prev('.source');
+    		$source.find('p[name="name"]').text($('#manage #edit_source input[name="name"]').val());
+    		$source.find('p[name="home"]').text($('#manage #edit_source input[name="home"]').val());
+    		$source.find('p[name="path"]').text($('#manage #edit_source input[name="path"]').val());
+    		$source.find('p[name="field"]').text($('#manage #edit_source input[name="field"]').val());
+    		$source.show();
+    		$('#manage #edit_source').hide();
+    		$('#manage #sources .source .fa-edit').show();
+    	})
+    	.fail(function() {
+    		console.log("error");
+    	})
+    	.always(function() {
+    		console.log("complete");
+    	});	
+    });
+
+    // 删除数据源
+     $('#manage #sources').on('click', '.source .fa-times', function() {
+        var $source = $(this).parent('h4').parent('.panel-heading').parent().parent('.source');
+        $.ajax({
+    		url: '{{url_for("api_remove_source")}}',
+        	type: 'POST',
+        	dataType: 'json',
+        	data: {
+        		id: $source.find('p[name="id"]').text()
+        	},
+        })
+        .done(function() {
+        	$source.remove();
+        })
+        .fail(function() {
+        	console.log("error");
+        })
+        .always(function() {
+        	console.log("complete");
+        });
+    });
+
+    // 新建爬取任务
+     $('#manage #sources').on('click', '.source .fa-bug', function() {
+        var $obj = $(this);
+        $obj.addClass('active');
+        var $source = $(this).parent('h4').parent('.panel-heading').parent().parent('.source');
+    	$.ajax({
+    		url: '{{url_for("crawl_get_data")}}',
+    		type: 'POST',
+    		dataType: 'json',
+    		data: {
+    			id: $source.find('p[name="id"]').text()
+    		},
+    	})
+    	.done(function() {
+            $obj.removeClass('active');
+    	})
+    	.fail(function() {
+    		console.log("error");
+    	})
+    	.always(function() {
+    		console.log("complete");
+    	});
+    	
+    });
+});
+</script>
+<div id="manage">
+    <div>
+        <h3 style="margin-top:0;">数据源列表<span id="add_source" class="fa fa-fw fa-plus"></span></h3>
+    </div>
+    <div id="sources">
+        <div id='new_source'>
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h4 class="panel-title">添加数据源</h4></div>
+                <div class="panel-body">
+                    <div class='form-group'>
+                        <input type='text' name='name' class='form-control' placeholder='名称'>
+                        <input type='text' name='home' class='form-control' placeholder='首页'>
+                        <input type='text' name='path' class='form-control' placeholder='爬取路径'>
+                        <input type='text' name='field' class='form-control' placeholder='字段解析'>
+                    </div>
+                    <span id='add_new' class='btn btn-default'>添加</span>
+                </div>
+            </div>
+        </div>
+        <div id='edit_source'>
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h4 class="panel-title">编辑数据源</h4>
+                </div>
+                <div class="panel-body">
+                    <div class='form-group'>
+                        <input type='text' name='id' class='form-control' placeholder='id' style="display:none;">
+                        <input type='text' name='name' class='form-control' placeholder='名称'>
+                        <input type='text' name='home' class='form-control' placeholder='首页'>
+                        <input type='text' name='path' class='form-control' placeholder='爬取路径'>
+                        <input type='text' name='field' class='form-control' placeholder='字段解析'>
+                    </div>
+                    <span id='save_source' class='btn btn-default'>保存</span>
+                </div>
+            </div>
+        </div>
+        {% for item in sources %}
+        <div class="source" name="{{item.id}}">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title">{{item.name}}<span style="margin-left:20px" class="fa fa-fw fa-edit"></span><span style="margin-left:20px" class="fa fa-fw fa-times"></span><span style="margin-left:20px" class="fa fa-fw fa-bug"></span></h4>
+                </div>
+                <div class="panel-body">
+                    <p name='id' style="display:none;">{{item.id}}</p>
+                    <p name='name' style="display:none;">{{item.name}}</p>
+                    <p name='home'>{{item.home}}</p>
+                    <p name='path'>{{item.path}}</p>
+                    <p name='field'>{{item.field}}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
