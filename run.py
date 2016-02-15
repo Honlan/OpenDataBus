@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # coding:utf8
 
+import time
 import sys
 reload(sys)
 sys.setdefaultencoding( "utf8" )
 from flask import *
 import warnings
 warnings.filterwarnings("ignore")
-import MySQLdb
-import MySQLdb.cursors
 from config import *
 from module.api import *
 from module.crawl import *
@@ -38,16 +37,27 @@ def source(source_id):
 	(db,cursor) = connectdb()
 	cursor.execute('select content from item where source_id=%s', [source_id])
 	items = cursor.fetchall()
+	result = []
+	for item in items:
+		item = item['content'].split('^')
+		tmp = {}
+		for i in item:
+			tmp[i.split('$')[0]] = i.split('$')[1]
+		result.append(tmp)
+	items = result
 	cursor.execute('select * from source where id=%s', [source_id])
 	source = cursor.fetchone()
 	closedb(db,cursor)
-	return render_template('source.html', source=source, items=items)
+	return render_template('source.html', source=source, items=json.dumps(items), count=len(items))
 
 @app.route('/manage')
 def manage():
 	(db,cursor) = connectdb()
 	cursor.execute('select * from source order by timestamp desc')
 	sources = cursor.fetchall()
+	for item in sources:
+		if not item['lastcrawl'] == '':
+			item['lastcrawl'] = time.strftime('%Y-%m-%d %H:%M', time.localtime(float(item['lastcrawl'])))
 	closedb(db,cursor)
 	return render_template('manage.html', sources=sources)
 

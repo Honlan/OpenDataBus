@@ -1,7 +1,7 @@
 {% extends 'layout.html' %} {% block style %}
 <style>
 #index {
-    padding: 40px 40px;
+    padding: 40px 60px;
 }
 </style>
 {% endblock %} {% block body %}
@@ -13,7 +13,7 @@ $(document).ready(function() {
 </script>
 <div id="index">
 	<div id="sources">
-		<table class="table table-hover">
+		<table class="table table-hover" style="margin-bottom:0;">
 			<tr>
 				<td>数据源</td>
 				<td>源地址</td>
@@ -23,7 +23,7 @@ $(document).ready(function() {
 			<tr>
 				<td><a href="{{url_for('source', source_id=item.id)}}">{{item.name}}</a></td>
 				<td><a href="{{item.home}}">{{item.home}}</a></td>
-				<td>{{datasets[item.id]}}</td>
+				<td><a href="{{url_for('source', source_id=item.id)}}">{{datasets[item.id]}}</a></td>
 			</tr>	
 			{% endfor %}
 		</table>

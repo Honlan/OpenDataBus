@@ -1,17 +1,44 @@
 {% extends 'layout.html' %} {% block style %}
 <style>
 #source {
-    padding: 40px 40px;
+    padding: 40px 60px;
 }
 </style>
 {% endblock %} {% block body %}
 <script>
 $(document).ready(function() {
-
+    // var datasets = eval({{items | safe}});
+    // var indexs = [];
+    // for (var i = 0; i < datasets.length; i++) {
+    //     indexs.push(i);
+    // }
+    // var font_size = d3.scale.linear()
+    //     .domain([0, 1])
+    //     .range([5, 20]);
+    // var font_opacity = d3.scale.linear()
+    //     .domain([0, 1])
+    //     .range([0.05, 1.2]);
+    // var font_z_index = d3.scale.linear()
+    //     .domain([0, 1])
+    //     .range([1, 999]);
+    // d3.select("#datasets g").selectAll("text").data(indexs).enter().append("text").text(function(d, i) {
+    //     return datasets[d]['数据名称'];
+    // }).attr("x", function() {
+    //     return parseInt(60 + Math.random() * 800);
+    // }).attr("y", function() {
+    //     return parseInt(50 + Math.random() * 250);
+    // }).style("fill-opacity", 1e-6).transition().duration(function(d, i) {
+    //     return i * 10;
+    // }).style("fill-opacity", 1).attr("fill", "black").attr("style", function(d, i) {
+    //     var weight = Math.random();
+    //     return "font-size: " + parseInt(font_size(weight)) + "px; opacity: " + (font_opacity(weight)).toFixed(2) + "; z-index: " + parseInt(font_z_index(weight));
+    // });
 });
 </script>
 <div id="source">
-	{{source.name}}
-	{{source.home}}
+    <h3><a href="{{source.home}}">{{source.name}}</a><small style="margin-left:10px;">{{count}}个数据集</small></h3>
+    <!-- <svg width="1024px" height="400px" id="datasets">
+        <g></g>
+    </svg> -->
 </div>
 {% endblock %}

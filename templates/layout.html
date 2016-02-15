@@ -13,6 +13,7 @@
     <script src="http://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
     <link href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" />
     <script src="http://cdn.bootcss.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
     <script src="{{url_for('static',filename='js/jquerySession.js')}}"></script>
     {% block style %} {% endblock %}
@@ -39,6 +40,7 @@
         width: 100%;
         top: 0;
         background-color: #fdfdfd;
+        z-index: 999;
     }
     
     #header h3 {

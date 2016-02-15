@@ -25,6 +25,14 @@
     margin-bottom: 15px;
 }
 
+#manage .last-crawl-time {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 13px;
+    color: #E48989;
+}
+
 #manage #sources .source .fa:hover {
     cursor: pointer;
 }
@@ -269,8 +277,8 @@ $(document).ready(function() {
         {% for item in sources %}
         <div class="source" name="{{item.id}}">
             <div class="panel panel-info">
-                <div class="panel-heading">
-                    <h4 class="panel-title">{{item.name}}<span style="margin-left:20px" class="fa fa-fw fa-edit"></span><span style="margin-left:20px" class="fa fa-fw fa-times"></span><span style="margin-left:20px" class="fa fa-fw fa-bug"></span></h4>
+                <div class="panel-heading" style="position:relative;">
+                    <h4 class="panel-title">{{item.name}}<span style="margin-left:20px" class="fa fa-fw fa-edit"></span><span style="margin-left:20px" class="fa fa-fw fa-times"></span><span style="margin-left:20px" class="fa fa-fw fa-bug"></span><div class="last-crawl-time">{{item.lastcrawl}}</div></h4>
                 </div>
                 <div class="panel-body">
                     <p name='id' style="display:none;">{{item.id}}</p>
